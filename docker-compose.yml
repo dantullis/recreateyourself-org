@@ -1,0 +1,19 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: "3.8"
+# Define services
+services:
+  # Frontend Service 
+  app-client:
+    # Configuration for building the docker image for the frontend service
+    container_name: recreateyourself-client.prod.container #unique
+    build:
+      context: angular-client # Use an image built from the specified dockerfile in the `angular-client` directory.
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "4202:80" # Map the exposed port 80 on the container to port 4202 on the host machine
+    volumes:
+      - ./angular-client:/node/app
+      - ./angular-client:/node/app/node_modules # hide the one from the host with an anonymous volume
+    environment:
+      NODE_ENV: production

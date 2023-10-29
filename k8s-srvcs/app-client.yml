@@ -1,0 +1,44 @@
+apiVersion: apps/v1 #API version
+kind: Deployment #Type of K8S resource
+metadata:
+  name: recreate-yourself-client #Name of the K8S resource
+spec:
+  minReadySeconds: 120
+  replicas: 1 #No of replicas/pods to run
+  selector:                     
+    matchLabels: #This deployment applies to Pods matching the specified labels
+      app: recreate-yourself-client
+  template: #Template for creating the Pods in this deployment
+    metadata:
+      labels: #Labels that will be applied to all the Pods in this deployment
+        app: recreate-yourself-client
+    spec: #Spec for the containers that will run inside the Pods
+      imagePullSecrets:
+      - name: docker-hub
+      containers:
+      - name: recreate-yourself-client
+        image: dantullis/recreate-yourself-client:1.0.0
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 80 #Same port exposed in Docker image
+        resources:
+            limits:
+              cpu: 1
+              memory: 512M
+            requests:
+              cpu: 0.2
+              memory: 256M
+---
+apiVersion: v1 #API version
+kind: Service #Type of kubernetes resource
+metadata:
+  name: recreate-yourself-client #Name of the kubernetes resource
+spec:
+  type: NodePort #Exposes the service by opening a port on each node
+  selector:
+    app: recreate-yourself-client #Any Pod matching the label `app=recreate-yourself-client` will be picked up by this service
+  ports: #Forward incoming connections on targetport 80 in pod to port 80 (Same in Ingress)
+  - name: http
+    port: 80
+    targetPort: 80

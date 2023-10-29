@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /authentication/
+Disallow: /errors/
+Disallow: /auth-login/
+Disallow: /secure/
+Sitemap: https://www.recreateyourself.org/sitemap.xml

@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: recreate-yourself-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "www.recreateyourself.org"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_clear_headers "Server";
+      more_clear_headers "X-Powered-By";
+      more_set_headers "Content-Security-Policy: frame-ancestors 'self' *.recreateyourself.org;";
+      more_set_headers "Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
+      more_set_headers "Referrer-Policy: same-origin";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Xss-Protection: 1; mode=block";
+      proxy_set_header X-Prerender-Token prerender_token;
+      set $prerender 0; 
+      if ($http_user_agent ~* "googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest\/0\.|pinterestbot|slackbot|vkShare|W3C_Validator|whatsapp")
+      {
+        set $prerender 1;
+      } 
+      if ($args ~ "_escaped_fragment_") {
+        set $prerender 1;
+      }
+      if ($http_user_agent ~ "Prerender") {
+        set $prerender 0;
+      }
+      if ($uri ~* "\.(js|css|xml|less|png|jpg|jpeg|gif|pdf|doc|txt|ico|rss|zip|mp3|rar|exe|wmv|doc|avi|ppt|mpg|mpeg|tif|wav|mov|psd|ai|xls|mp4|m4a|swf|dat|dmg|iso|flv|m4v|torrent|ttf|woff|svg|eot)") {
+        set $prerender 0;
+      }
+      if ( $prerender = 1 ) {
+        proxy_pass https://service.prerender.io/$scheme://$host$request_uri?; 
+      }
+    nginx.ingress.kubernetes.io/server-snippet: |
+      gzip            on;
+      gzip_vary       on;
+      gzip_types      text/plain application/xml text/css application/javascript;
+      gzip_min_length 1000;
+spec:
+  tls:
+  - hosts:
+    - "recreateyourself.org"
+    - "www.recreateyourself.org"
+    secretName: recreate-yourself-tls
+  rules:
+  - host: "www.recreateyourself.org"
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: recreate-yourself-client
+            port:
+              number: 80
