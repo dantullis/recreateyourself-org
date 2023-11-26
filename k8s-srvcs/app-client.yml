@@ -23,12 +23,15 @@ spec:
           - name: http
             containerPort: 80 #Same port exposed in Docker image
         resources:
-            limits:
-              cpu: 1
-              memory: 512M
-            requests:
-              cpu: 0.2
-              memory: 256M
+          # limits:
+          #   cpu: 0.2
+          #   memory: 10M
+            # limits:
+            #   cpu: 1
+            #   memory: 512M
+            # requests:
+            #   cpu: 0.2
+            #   memory: 256M
 ---
 apiVersion: v1 #API version
 kind: Service #Type of kubernetes resource

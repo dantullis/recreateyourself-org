@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   appUrl: 'http://localhost:4202/',
   author: 'Daniel Tullis',
-  uiversion: 'v1.0.1',
+  uiversion: 'v1.0.2',
 };
 
 /*

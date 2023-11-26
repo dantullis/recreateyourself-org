@@ -58,7 +58,7 @@ export class HomeComponent implements OnInit {
       keywords: 'recreate yourself, recreateyourself',
       section: 'home',
       type: 'website',
-      url: environment.appUrl + 'home',
+      url: environment.appUrl,
       // published: string;
       // modified: string;
     };
